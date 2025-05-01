@@ -1,19 +1,41 @@
 -- core/city.lua
-local city = {}
-local grid = {}
+local tileFactory = require("tiles.tileFactory")
 
-function city.init(width, height)
-    grid = {}
+local City = {}
+City.__index = City
+
+function City.new(width, height)
+    local city = setmetatable({}, City)
+    city.width = width
+    city.height = height
+    city.grid = {}
     for x = 1, width do
-        grid[x] = {}
+        city.grid[x] = {}
         for y = 1, height do
-            grid[x][y] = { type = "empty", traffic = 0 }
+            city.grid[x][y] = tileFactory.new("empty")
         end
     end
+    return city
 end
 
-function city.getGrid()
-    return grid
+-- Set Tile in the City grid
+function City:SetTile(x, y, type)
+    if x < 1 or x > self.width or y < 1 or y > self.height then
+        error("Grid position (" .. x .. "," .. y .. ") out of bounds")
+    end
+    local newTile = tileFactory.new(type)
+    if not newTile:CanPlace(self.grid[x][y]) then
+        error("Cannot place " .. type .. " on " .. self.grid[x][y].type)
+    end
+    self.grid[x][y] = newTile
 end
 
-return city
+-- Get Tile from the City grid
+function City:GetTile(x, y)
+    if x < 1 or x > self.width or y < 1 or y > self.height then
+        return nil
+    end
+    return self.grid[x][y]
+end
+
+return City

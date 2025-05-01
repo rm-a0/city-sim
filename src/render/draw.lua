@@ -1,16 +1,14 @@
 -- render/draw.lua
 local draw = {}
-local tileSize = 5
 
-function draw.grid(grid)
-    for x = 1, #grid do
-        for y = 1, #grid[1] do
-            if grid[x][y].type == "residential" then
-                love.graphics.setColor(0, 1, 0)
-            else
-                love.graphics.setColor(0.5, 0.5, 0.5)
+-- Render grid
+function draw.grid(city, tileSize)
+    for x = 1, city.width do
+        for y = 1, city.height do
+            local tile = city:GetTile(x, y)
+            if tile then
+                tile:Render2D(x, y, tileSize)
             end
-            love.graphics.rectangle("fill", (x-1)*tileSize, (y-1)*tileSize, tileSize, tileSize)
         end
     end
 end

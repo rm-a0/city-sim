@@ -1,14 +1,21 @@
 -- main.lua
 local city = require("core.city")
+local generator = require("core.generator")
 local draw = require("render.draw")
 
-function love.load()
-    city.init(100, 100)
+local _city
+local _generator
+local tileSize = 10
 
-    local grid = city.getGrid()
-    grid[5][5] = { type = "residential", traffic = 0 }
+function love.load()
+    _city = city.new(100, 100)
+    _generator = generator.new()
+    _generator:generateLayerOne(_city)
+
+    _city:SetTile(5, 5, "residential")
+    _city:SetTile(6, 6, "commercial")
 end
 
 function love.draw()
-    draw.grid(city.getGrid())
+    draw.grid(_city, tileSize)
 end
