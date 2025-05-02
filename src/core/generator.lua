@@ -10,6 +10,29 @@ function Generator.new()
     return setmetatable({}, Generator)
 end
 
+function Generator:generateTopology(city)
+    for x = 1, city.width do
+        for y = 1, city.height do
+            local n = (noise.perlin(x * 0.1, y * 0.1) + 1)/2
+            if n < 0.2 then
+                city:SetTile(x, y, "depth01")
+            elseif n < 0.2 then
+                city:SetTile(x, y, "depth02")
+            elseif n < 0.35 then
+                city:SetTile(x, y, "depth03")
+            elseif n < 0.5 then
+                city:SetTile(x, y, "depth04")
+            elseif n < 0.65 then
+                city:SetTile(x, y, "depth05")
+            elseif n < 0.8 then
+                city:SetTile(x, y, "depth06")
+            else
+                city:SetTile(x, y, "depth07")
+            end
+        end
+    end
+end
+
 function Generator:generateLakes(city)
     for x = 1, city.width do
         for y = 1, city.height do
@@ -17,7 +40,6 @@ function Generator:generateLakes(city)
             if n < 0.25 then
                 city:SetTile(x, y, "water")
             end
-
         end
     end
 end
@@ -31,8 +53,8 @@ end
 local function generateSeeds(width, height)
     local zoneTypes = {
         { type = "residential", frequency = 0.5 },
-        { type = "commercial",  frequency = 0.4 },
-        { type = "industrial",  frequency = 0.1 },
+        { type = "commercial",  frequency = 0.45 },
+        { type = "industrial",  frequency = 0.05 },
     }
 
     local radius = 4

@@ -19,6 +19,7 @@ function love.update(dt)
     time = time + dt
     if time > delay then
         if step == 1 then
+            --_generator:generateTopology(_city)
             _generator:generateLakes(_city)
         elseif step == 2 then
             _generator:generateRivers(_city)

@@ -1,5 +1,5 @@
 # Overview
-Procedurally generated city simulator written in Lua using LÖVE 2D library.
+Procedurally generated city simulator written in Lua using [LÖVE 2D](https://github.com/love2d/love) library.
 
 # Table of Contents
   - [How to Use](#how-to-use)
