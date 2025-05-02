@@ -25,7 +25,7 @@ function City:SetTile(x, y, type)
     end
     local newTile = tileFactory.new(type)
     if not newTile:CanPlace(self.grid[x][y]) then
-        error("Cannot place " .. type .. " on " .. self.grid[x][y].type)
+        return
     end
     self.grid[x][y] = newTile
 end

@@ -6,7 +6,9 @@ local tile = require("tiles.tile")
 tileFactory.types = {
     empty = require("tiles.empty"),
     residential = require("tiles.residential"),
-    commercial = require("tiles.commercial")
+    commercial = require("tiles.commercial"),
+    industrial = require("tiles.industrial"),
+    water = require("tiles.water"),
 }
 
 -- Create a new tile instance

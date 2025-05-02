@@ -8,12 +8,11 @@ local _generator
 local tileSize = 10
 
 function love.load()
-    _city = city.new(100, 100)
+    _city = city.new(1000, 1000)
     _generator = generator.new()
-    _generator:generateLayerOne(_city)
-
-    _city:SetTile(5, 5, "residential")
-    _city:SetTile(6, 6, "commercial")
+    _generator:generateLakes(_city)
+    _generator:generateRivers(_city)
+    _generator:generateCityZones(_city)
 end
 
 function love.draw()
