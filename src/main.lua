@@ -8,7 +8,7 @@ local _generator
 local tileSize = 10
 
 function love.load()
-    _city = city.new(1000, 1000)
+    _city = city.new(500, 500)
     _generator = generator.new()
     _generator:generateLakes(_city)
     _generator:generateRivers(_city)
