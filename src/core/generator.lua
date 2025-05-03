@@ -2,6 +2,7 @@
 local noise = require("procedural.noise")
 local voronoi = require("procedural.voronoi")
 local poisson = require("procedural.poisson")
+local floodFill = require("utils.floodFill")
 
 local Generator = {}
 Generator.__index = Generator
@@ -16,15 +17,15 @@ function Generator:generateTopology(city)
             local n = (noise.perlin(x * 0.1, y * 0.1) + 1)/2
             if n < 0.2 then
                 city:SetTile(x, y, "depth01")
-            elseif n < 0.2 then
+            elseif n < 0.3 then
                 city:SetTile(x, y, "depth02")
-            elseif n < 0.35 then
+            elseif n < 0.4 then
                 city:SetTile(x, y, "depth03")
             elseif n < 0.5 then
                 city:SetTile(x, y, "depth04")
-            elseif n < 0.65 then
+            elseif n < 0.6 then
                 city:SetTile(x, y, "depth05")
-            elseif n < 0.8 then
+            elseif n < 0.7 then
                 city:SetTile(x, y, "depth06")
             else
                 city:SetTile(x, y, "depth07")
@@ -33,15 +34,37 @@ function Generator:generateTopology(city)
     end
 end
 
+function Generator:processLakeTiles(city)
+    local groups = floodFill(self.lakeTiles, city.width, city.height)
+
+    for _, group in ipairs(groups) do
+        -- Choose center of mass
+        local sumX, sumY = 0, 0
+        for _, pt in ipairs(group) do
+            sumX = sumX + pt.x
+            sumY = sumY + pt.y
+        end
+        local cx = math.floor(sumX / #group)
+        local cy = math.floor(sumY / #group)
+
+        table.insert(self.lakes, {x = cx, y = cy})
+    end
+end
+
 function Generator:generateLakes(city)
+    self.lakes = {}
+    self.lakeTiles = {}
+
     for x = 1, city.width do
         for y = 1, city.height do
             local n = (noise.perlin(x * 0.1, y * 0.1) + 1)/2
-            if n < 0.25 then
+            if n < 0.2 then
                 city:SetTile(x, y, "water")
+                table.insert(self.lakeTiles, {x = x, y = y})
             end
         end
     end
+    self:processLakeTiles(city)
 end
 
 function Generator:generateRivers(city)
@@ -57,7 +80,7 @@ local function generateSeeds(width, height)
         { type = "industrial",  frequency = 0.05 },
     }
 
-    local radius = 4
+    local radius = 8
     local rawPoints = poisson.sample(width, height, radius)
 
     -- Build a weighted list of types

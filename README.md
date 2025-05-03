@@ -33,7 +33,6 @@ love city-sim/src
 │   ├── generator.lua        # Encapsulates procedural generation
 ├── procedural/
 │   ├── noise.lua            # Perlin noise generation for terrain features
-│   ├── aStar.lua            # A* algorithm for zone connection (Not implementd yet)
 │   ├── voronoi.lua          # Voronoi diagram for zoning
 │   ├── poisson.lua          # Poisson disk sampling for layout
 ├── render/
@@ -51,4 +50,4 @@ The city is generated using several layers of procedural techniques. Each layer 
 The first layer is generated using [Perlin Noise](#https://en.wikipedia.org/wiki/Perlin_noise), which is commonly used for generating terrain, such as landscapes or environmental features.
 
 ### Zone Layer
-Once the base terrain is established, [Voronoi Diagrams](https://en.wikipedia.org/wiki/Voronoi_diagram) are used to generate city zones like residential, commercial, and industrial areas. Seeds are generated using [Poisson Disk Sampling](https://en.wikipedia.org/wiki/Poisson_sampling) for more natural and spaced layout.
+Once the base terrain is established, [Voronoi Diagrams](https://en.wikipedia.org/wiki/Voronoi_diagram) are used to generate city zones like residential, commercial, and industrial areas. Seeds are generated using [Poisson Disk Sampling](https://en.wikipedia.org/wiki/Poisson_sampling) for more natural and spaced layout. Additionally there is a possibility to set frequency for each zone

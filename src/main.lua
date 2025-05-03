@@ -5,7 +5,7 @@ local draw = require("render.draw")
 
 local _city
 local _generator
-local tileSize = 10
+local tileSize = 5
 local step = 1
 local time = 0
 local delay = 0.5
@@ -19,12 +19,16 @@ function love.update(dt)
     time = time + dt
     if time > delay then
         if step == 1 then
-            --_generator:generateTopology(_city)
+            -- _generator:generateTopology(_city)
             _generator:generateLakes(_city)
         elseif step == 2 then
             _generator:generateRivers(_city)
         elseif step == 3 then
             _generator:generateCityZones(_city)
+        elseif step == 4 then
+            -- generate buildings
+        elseif step == 5 then
+            -- generate roads
         end
         step = step + 1
         time = 0
