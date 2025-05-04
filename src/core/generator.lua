@@ -2,7 +2,7 @@
 local noise = require("procedural.noise")
 local voronoi = require("procedural.voronoi")
 local poisson = require("procedural.poisson")
-local floodFill = require("utils.floodFill")
+local algorithms = require("utils.algorithm")
 
 local Generator = {}
 Generator.__index = Generator
@@ -35,7 +35,7 @@ function Generator:generateTopology(city)
 end
 
 function Generator:processLakeTiles(city)
-    local groups = floodFill(self.lakeTiles, city.width, city.height)
+    local groups = algorithms.floodFill(self.lakeTiles, city.width, city.height)
 
     for _, group in ipairs(groups) do
         -- Choose center of mass

@@ -1,7 +1,4 @@
--- utils/floodFill.lua
-local floodFill = {}
-
--- Flood fill implementation
+-- utils/algorithms/floodFill.lua
 local function floodFill(points, width, height)
     local visited = {}
     local groups = {}
