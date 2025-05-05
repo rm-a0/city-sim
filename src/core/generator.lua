@@ -38,7 +38,6 @@ function Generator:processLakeTiles(city)
     local groups = algorithms.floodFill(self.lakeTiles, city.width, city.height)
 
     for _, group in ipairs(groups) do
-        -- Choose center of mass
         local sumX, sumY = 0, 0
         for _, pt in ipairs(group) do
             sumX = sumX + pt.x
@@ -67,15 +66,245 @@ function Generator:generateLakes(city)
     self:processLakeTiles(city)
 end
 
-function Generator:generateRivers(city)
-    for i = 1, #self.lakes do
-        if (i + 1) > #self.lakes then break end
-        local path = algorithms.aStar.run(self.lakes[i], self.lakes[i+1], algorithms.aStar.wavyHeuristic, city.grid)
-        if not  path then break end
+function Generator:generateRiverChains(city)
+    if not self.lakes or #self.lakes < 2 then
+        self.riverChains = {}
+        return
+    end
+
+    local edgeThreshold = 8
+    local minChainLength = 3
+    local maxChainLength = 10
+    local maxChains = math.floor(#self.lakes / 2)
+    local minPairDistance = 5
+    local riverChains = {}
+    local usedLakes = {}
+
+    local function copyTable(tbl)
+        local copy = {}
+        for k, v in pairs(tbl) do
+            copy[k] = v
+        end
+        return copy
+    end
+
+    local function isNearEdge(lake)
+        return lake.x <= edgeThreshold or lake.x >= city.width - edgeThreshold or
+               lake.y <= edgeThreshold or lake.y >= city.height - edgeThreshold
+    end
+
+    local function getEdgePoint(lake)
+        local minDist = math.huge
+        local edgePoint = nil
+        local edges = {
+            {x = 1, y = lake.y},
+            {x = city.width, y = lake.y},
+            {x = lake.x, y = 1},
+            {x = lake.x, y = city.height}
+        }
+        for _, pt in ipairs(edges) do
+            local dist = math.sqrt((lake.x - pt.x)^2 + (lake.y - pt.y)^2)
+            if dist < minDist then
+                minDist = dist
+                edgePoint = pt
+            end
+        end
+        return edgePoint
+    end
+
+    local function distance(lake1, lake2)
+        return math.sqrt((lake1.x - lake2.x)^2 + (lake1.y - lake2.y)^2)
+    end
+
+    local function findNextLake(current, exclude)
+        local bestLake = nil
+        local bestScore = math.huge
+        local bestIndex = nil
+
+        for i, lake in ipairs(self.lakes) do
+            if not exclude[i] then
+                local dist = distance(current, lake)
+                if dist >= minPairDistance then
+                    local dx, dy = math.abs(current.x - lake.x), math.abs(current.y - lake.y)
+                    local alignmentScore = math.min(dx, dy)
+                    local score = dist + alignmentScore * 0.5
+                    if score < bestScore then
+                        bestScore = score
+                        bestLake = lake
+                        bestIndex = i
+                    end
+                end
+            end
+        end
+
+        return bestLake, bestIndex
+    end
+
+    while #riverChains < maxChains and #usedLakes < #self.lakes do
+        local chain = {}
+        local chainLength = math.random(minChainLength, maxChainLength)
+        local currentIndex = nil
+        local exclude = copyTable(usedLakes)
+
+        local availableLakes = {}
+        for i = 1, #self.lakes do
+            if not usedLakes[i] then
+                table.insert(availableLakes, i)
+            end
+        end
+        if #availableLakes == 0 then break end
+        currentIndex = availableLakes[math.random(#availableLakes)]
+        table.insert(chain, self.lakes[currentIndex])
+        exclude[currentIndex] = true
+
+        for i = 2, chainLength do
+            local nextLake, nextIndex = findNextLake(chain[#chain], exclude)
+            if nextLake then
+                table.insert(chain, nextLake)
+                exclude[nextIndex] = true
+            else
+                break
+            end
+        end
+
+        local lastLake = chain[#chain]
+        if not isNearEdge(lastLake) then
+            local edgePoint = getEdgePoint(lastLake)
+            table.insert(chain, edgePoint)
+        end
+
+        if #chain >= minChainLength then
+            table.insert(riverChains, chain)
+            for i, lake in ipairs(chain) do
+                for j, origLake in ipairs(self.lakes) do
+                    if lake.x == origLake.x and lake.y == origLake.y then
+                        usedLakes[j] = true
+                    end
+                end
+            end
+        end
+    end
+
+    self.riverChains = riverChains
+end
+
+function Generator:postProcessRivers(city, paths)
+    local minRiverLength = 5
+    local mergeThreshold = 3
+
+    local function distance(pt1, pt2)
+        return math.sqrt((pt1.x - pt2.x)^2 + (pt1.y - pt2.y)^2)
+    end
+
+    local function getEdgePoint(pt)
+        local minDist = math.huge
+        local edgePoint = nil
+        local edges = {
+            {x = 1, y = pt.y},
+            {x = city.width, y = pt.y},
+            {x = pt.x, y = 1},
+            {x = pt.x, y = city.height}
+        }
+        for _, edge in ipairs(edges) do
+            local dist = distance(pt, edge)
+            if dist < minDist then
+                minDist = dist
+                edgePoint = edge
+            end
+        end
+        return edgePoint
+    end
+
+    local function smoothPath(path, amplitude, frequency, phaseShift)
+        for i = 2, #path - 1 do
+            local x = path[i].x
+            local startX = path[1].x
+            local endX = path[#path].x
+            local expectedY = path[1].y + amplitude * math.sin(frequency * (x - endX) + phaseShift)
+            expectedY = math.max(1, math.min(city.height, math.floor(expectedY + 0.5)))
+            path[i].y = expectedY
+        end
+        return path
+    end
+
+    -- Step 1: Remove short rivers
+    local filteredPaths = {}
+    for _, path in ipairs(paths) do
+        if #path >= minRiverLength then
+            table.insert(filteredPaths, path)
+        end
+    end
+
+    -- Step 2: Merge overlapping or nearby rivers
+    local mergedPaths = {}
+    local tileMap = {}
+    for _, path in ipairs(filteredPaths) do
+        local isMerged = false
+        for _, pt in ipairs(path) do
+            local key = pt.x .. "," .. pt.y
+            tileMap[key] = (tileMap[key] or 0) + 1
+            if tileMap[key] > 1 then
+                isMerged = true
+            end
+        end
+        if not isMerged then
+            table.insert(mergedPaths, path)
+        else
+            for _, pt in ipairs(path) do
+                city:SetTile(pt.x, pt.y, "water")
+            end
+        end
+    end
+
+    -- Step 3: Extend internal rivers to edges
+    for i, path in ipairs(mergedPaths) do
+        local lastPoint = path[#path]
+        if not (lastPoint.x == 1 or lastPoint.x == city.width or
+                lastPoint.y == 1 or lastPoint.y == city.height) then
+            local edgePoint = getEdgePoint(lastPoint)
+            local extension = algorithms.aStar.run(lastPoint, edgePoint, algorithms.aStar.wavyHeuristic, city.grid)
+            if extension then
+                for j = 2, #extension do
+                    table.insert(path, extension[j])
+                end
+            end
+        end
+    end
+
+    -- Step 4: Smooth paths
+    for i, path in ipairs(mergedPaths) do
+        local distance = distance(path[1], path[#path])
+        local baseAmplitude = distance * 0.15
+        baseAmplitude = math.min(baseAmplitude, 10)
+        baseAmplitude = math.max(baseAmplitude, 2)
+        local randomFactor = 0.8 + (math.random() * 0.4)
+        local amplitude = baseAmplitude * randomFactor
+        local frequency = 0.05
+        local phaseShift = math.random() * 2 * math.pi
+        mergedPaths[i] = smoothPath(path, amplitude, frequency, phaseShift)
+    end
+
+    -- Step 5: Apply merged and smoothed paths to grid
+    for _, path in ipairs(mergedPaths) do
         for _, pt in ipairs(path) do
             city:SetTile(pt.x, pt.y, "water")
         end
     end
+end
+
+
+function Generator:generateRivers(city)
+    self:generateRiverChains(city)
+    local paths = {}
+    for _, chain in ipairs(self.riverChains) do
+        for i = 1, #chain - 1 do
+            local path = algorithms.aStar.run(chain[i], chain[i + 1], algorithms.aStar.wavyHeuristic, city.grid)
+            if path then
+                table.insert(paths, path)
+            end
+        end
+    end
+    self:postProcessRivers(city, paths)
 end
 
 local function generateSeeds(width, height)
@@ -88,7 +317,6 @@ local function generateSeeds(width, height)
     local radius = 8
     local rawPoints = poisson.sample(width, height, radius)
 
-    -- Build a weighted list of types
     local weightedList = {}
     for _, zone in ipairs(zoneTypes) do
         local count = math.floor(zone.frequency * 100)

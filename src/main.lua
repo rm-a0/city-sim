@@ -5,13 +5,18 @@ local draw = require("render.draw")
 
 local _city
 local _generator
+
 local tileSize = 5
+local cityWidth = 300
+local cityHeight = 200
+
 local step = 1
 local time = 0
 local delay = 0.5
 
 function love.load()
-    _city = city.new(200, 200)
+    love.window.setMode(cityWidth * tileSize, cityHeight * tileSize, {resizable = true, minwidth = cityWidth, minheight = cityHeight})
+    _city = city.new(cityWidth, cityHeight)
     _generator = generator.new()
 end
 
