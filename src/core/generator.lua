@@ -68,9 +68,14 @@ function Generator:generateLakes(city)
 end
 
 function Generator:generateRivers(city)
-    -- find bodies of water
-    -- find path between them
-    -- TODO later
+    for i = 1, #self.lakes do
+        if (i + 1) > #self.lakes then break end
+        local path = algorithms.aStar.run(self.lakes[i], self.lakes[i+1], algorithms.aStar.wavyHeuristic, city.grid)
+        if not  path then break end
+        for _, pt in ipairs(path) do
+            city:SetTile(pt.x, pt.y, "water")
+        end
+    end
 end
 
 local function generateSeeds(width, height)

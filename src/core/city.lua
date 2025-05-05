@@ -20,6 +20,9 @@ end
 
 -- Set Tile in the City grid
 function City:SetTile(x, y, type)
+    if not x or not y then
+        return
+    end
     if x < 1 or x > self.width or y < 1 or y > self.height then
         error("Grid position (" .. x .. "," .. y .. ") out of bounds")
     end

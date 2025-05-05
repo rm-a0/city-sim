@@ -11,7 +11,7 @@ local time = 0
 local delay = 0.5
 
 function love.load()
-    _city = city.new(500, 500)
+    _city = city.new(200, 200)
     _generator = generator.new()
 end
 
