@@ -54,5 +54,8 @@ The city is generated using several layers of procedural techniques. Each layer 
 ### Base Layer
 The first layer is generated using [Perlin Noise](https://en.wikipedia.org/wiki/Perlin_noise), which is commonly used for generating terrain, such as landscapes or environmental features.
 
+#### River Generation
+After the lakes are generated, create chains of lakes based on distance between them (you can adjust minimum and maximum number of chains in `core/generator.lua`). These chains are then processed through [A* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) with custom heuristic that makes the path between 2 points look wavy. This was achieved by utilizing sine function with its applitude amplified by distance between the two points and then slightly randomized.
+
 ### Zone Layer
 Once the base terrain is established, [Voronoi Diagrams](https://en.wikipedia.org/wiki/Voronoi_diagram) are used to generate city zones like residential, commercial, and industrial areas. Seeds are generated using [Poisson Disk Sampling](https://en.wikipedia.org/wiki/Poisson_sampling) for more natural and spaced layout. Additionally there is a possibility to set frequency for each zone

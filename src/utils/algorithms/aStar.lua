@@ -9,7 +9,7 @@ function aStar.wavyHeuristic(a, b)
     local base = dx + dy
 
     local distance = math.sqrt(dx^2 + dy^2)
-    local baseAmplitude = distance * 10000000
+    local baseAmplitude = distance * 100
 
     -- Add slight randomness to amplitude
     local randomFactor = 0.8 + (math.random() * 0.4)

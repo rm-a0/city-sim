@@ -235,7 +235,6 @@ function Generator:postProcessRivers(city, paths)
         end
     end
 
-    -- Step 2: Merge overlapping or nearby rivers
     local mergedPaths = {}
     local tileMap = {}
     for _, path in ipairs(filteredPaths) do
@@ -256,7 +255,6 @@ function Generator:postProcessRivers(city, paths)
         end
     end
 
-    -- Step 3: Extend internal rivers to edges
     for i, path in ipairs(mergedPaths) do
         local lastPoint = path[#path]
         if not (lastPoint.x == 1 or lastPoint.x == city.width or
@@ -271,7 +269,6 @@ function Generator:postProcessRivers(city, paths)
         end
     end
 
-    -- Step 4: Smooth paths
     for i, path in ipairs(mergedPaths) do
         local distance = distance(path[1], path[#path])
         local baseAmplitude = distance * 0.15
@@ -284,7 +281,6 @@ function Generator:postProcessRivers(city, paths)
         mergedPaths[i] = smoothPath(path, amplitude, frequency, phaseShift)
     end
 
-    -- Step 5: Apply merged and smoothed paths to grid
     for _, path in ipairs(mergedPaths) do
         for _, pt in ipairs(path) do
             city:SetTile(pt.x, pt.y, "water")
