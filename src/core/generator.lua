@@ -57,7 +57,7 @@ function Generator:generateLakes(city)
 	for x = 1, city.width do
 		for y = 1, city.height do
 			local n = (noise.perlin(x * 0.1, y * 0.1) + 1) / 2
-			if n < 0.2 then
+			if n < 0.25 then
 				city:SetTile(x, y, "water")
 				table.insert(self.lakeTiles, { x = x, y = y })
 			end
@@ -255,6 +255,7 @@ function Generator:postProcessRivers(city, paths)
 		else
 			for _, pt in ipairs(path) do
 				city:SetTile(pt.x, pt.y, "water")
+				city:SetTile(pt.x + 1, pt.y + 1, "water")
 			end
 		end
 	end

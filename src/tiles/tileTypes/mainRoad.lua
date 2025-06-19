@@ -1,5 +1,5 @@
 -- tiles/tileTypes/mainRoad.lua
 return {
-	color = { 1 / 235, 1 / 236, 1 / 240 },
+	color = { 110 / 255, 110 / 255, 110 / 255 },
 	parent = { "commercial", "residential" },
 }
