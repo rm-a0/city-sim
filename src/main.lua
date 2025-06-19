@@ -6,9 +6,9 @@ local draw = require("render.draw")
 local _city
 local _generator
 
-local tileSize = 5
-local cityWidth = 300
-local cityHeight = 200
+local tileSize = 4
+local cityWidth = 400
+local cityHeight = 300
 
 local step = 1
 local time = 0
@@ -37,6 +37,8 @@ function love.update(dt)
 		elseif step == 4 then
 			_generator:generateRoads(_city)
 		elseif step == 5 then
+			_generator:generateInnerRoads(_city)
+		elseif step == 6 then
 			-- generate buildings
 		end
 		step = step + 1
@@ -47,4 +49,3 @@ end
 function love.draw()
 	draw.grid(_city, tileSize)
 end
-

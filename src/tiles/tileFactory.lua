@@ -10,6 +10,7 @@ tileFactory.types = {
 	industrial = require("tiles.tileTypes.industrial"),
 	water = require("tiles.tileTypes.water"),
 	mainRoad = require("tiles.tileTypes.mainRoad"),
+	secondaryRoad = require("tiles.tileTypes.secondaryRoad"),
 	-- topology tiles
 	depth01 = require("tiles.tileTypes.depth01"),
 	depth02 = require("tiles.tileTypes.depth02"),
@@ -30,4 +31,3 @@ function tileFactory.new(type)
 end
 
 return tileFactory
-

@@ -314,7 +314,7 @@ local function generateSeeds(width, height)
 	}
 
 	local radius = 8
-	local rawPoints = poisson.sample(width, height, radius)
+	local rawPoints = poisson.sampleDefault(width, height, radius)
 
 	local weightedList = {}
 	for _, zone in ipairs(zoneTypes) do
@@ -340,6 +340,9 @@ end
 function Generator:generateCityZones(city)
 	local seeds = generateSeeds(city.width, city.height)
 	local zoneMap = voronoi.zones(city.width, city.height, seeds)
+
+	self.seeds = seeds
+	self.zoneMap = zoneMap
 
 	for x = 1, city.width do
 		for y = 1, city.height do
@@ -381,6 +384,29 @@ function Generator:generateRoads(city)
 					end
 				end
 			end
+		end
+	end
+end
+
+function Generator:generateInnerRoads(city)
+	local rawPoints1 = poisson.sampleGrid(city.width, city.height, 6, 0.5)
+	local residentialRoads = voronoi.roads(city.width, city.height, rawPoints1)
+	local rawPoints2 = poisson.sampleDefault(city.width, city.height, 4)
+	local commercialRoads = voronoi.roads(city.width, city.height, rawPoints2)
+
+	for _, road in ipairs(residentialRoads) do
+		local x, y = road.x, road.y
+		local curr_tile = city:GetTile(x, y)
+		if curr_tile and curr_tile.type == "residential" then
+			city:SetTile(x, y, "secondaryRoad")
+		end
+	end
+
+	for _, road in ipairs(commercialRoads) do
+		local x, y = road.x, road.y
+		local curr_tile = city:GetTile(x, y)
+		if curr_tile and curr_tile.type == "commercial" then
+			city:SetTile(x, y, "secondaryRoad")
 		end
 	end
 end
