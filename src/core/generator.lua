@@ -259,7 +259,7 @@ function Generator:postProcessRivers(city, paths)
 		end
 	end
 
-	for i, path in ipairs(mergedPaths) do
+	for _, path in ipairs(mergedPaths) do
 		local lastPoint = path[#path]
 		if not (lastPoint.x == 1 or lastPoint.x == city.width or lastPoint.y == 1 or lastPoint.y == city.height) then
 			local edgePoint = getEdgePoint(lastPoint)
@@ -362,15 +362,20 @@ function Generator:generateRoads(city)
 
 			if allowed_road_zones[curr_tile.type] then
 				local neighbors = {
-					city:GetTile(x, y - 1),
-					city:GetTile(x, y + 1),
-					city:GetTile(x - 1, y),
-					city:GetTile(x + 1, y),
+					{ tile = city:GetTile(x, y - 1), x = x, y = y - 1 },
+					{ tile = city:GetTile(x, y + 1), x = x, y = y + 1 },
+					{ tile = city:GetTile(x - 1, y), x = x - 1, y = y },
+					{ tile = city:GetTile(x + 1, y), x = x + 1, y = y },
 				}
 
 				for _, neighbor in ipairs(neighbors) do
-					if neighbor and allowed_road_zones[neighbor.type] and neighbor.type ~= curr_tile.type then
+					if
+						neighbor.tile
+						and allowed_road_zones[neighbor.tile.type]
+						and neighbor.tile.type ~= curr_tile.type
+					then
 						city:SetTile(x, y, "mainRoad")
+						city:SetTile(neighbor.x, neighbor.y, "mainRoad")
 						break
 					end
 				end
