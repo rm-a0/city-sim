@@ -37,7 +37,7 @@ function love.update(dt)
 		elseif step == 4 then
 			_generator:generateRoads(_city)
 		elseif step == 5 then
-			_generator:generateInnerRoads(_city)
+			_generator:generateRoadsAndBridges(_city)
 		elseif step == 6 then
 			-- generate buildings
 		end

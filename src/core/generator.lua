@@ -388,25 +388,33 @@ function Generator:generateRoads(city)
 	end
 end
 
-function Generator:generateInnerRoads(city)
+function Generator:generateRoadsAndBridges(city)
 	local rawPoints1 = poisson.sampleGrid(city.width, city.height, 6, 0.5)
 	local residentialRoads = voronoi.roads(city.width, city.height, rawPoints1)
-	local rawPoints2 = poisson.sampleDefault(city.width, city.height, 4)
+	local rawPoints2 = poisson.sampleDefault(city.width, city.height, 5)
 	local commercialRoads = voronoi.roads(city.width, city.height, rawPoints2)
 
 	for _, road in ipairs(residentialRoads) do
 		local x, y = road.x, road.y
 		local curr_tile = city:GetTile(x, y)
-		if curr_tile and curr_tile.type == "residential" then
-			city:SetTile(x, y, "secondaryRoad")
+		if curr_tile and self.zoneMap[x][y] and self.zoneMap[x][y] == "residential" then
+			if curr_tile.type == "residential" then
+				city:SetTile(x, y, "secondaryRoad")
+			elseif curr_tile.type == "water" then
+				city:SetTile(x, y, "secondaryRoad")
+			end
 		end
 	end
 
 	for _, road in ipairs(commercialRoads) do
 		local x, y = road.x, road.y
 		local curr_tile = city:GetTile(x, y)
-		if curr_tile and curr_tile.type == "commercial" then
-			city:SetTile(x, y, "secondaryRoad")
+		if curr_tile and self.zoneMap[x][y] and self.zoneMap[x][y] == "commercial" then
+			if curr_tile.type == "commercial" then
+				city:SetTile(x, y, "secondaryRoad")
+			elseif curr_tile.type == "water" then
+				city:SetTile(x, y, "secondaryRoad")
+			end
 		end
 	end
 end
