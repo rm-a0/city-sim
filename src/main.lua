@@ -47,5 +47,6 @@ function love.update(dt)
 end
 
 function love.draw()
-	draw.grid(_city, tileSize)
+	draw.gridQuad(_city, tileSize)
+	-- draw.gridHexa(_city, tileSize) -- not recommended very unreliable for not natural structures
 end

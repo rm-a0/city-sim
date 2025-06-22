@@ -43,10 +43,26 @@ function Tile:GetColor()
 	return self:GetType().color
 end
 
--- Render the tile in 2D
-function Tile:Render2D(x, y, tileSize)
+-- Render the tile as quad
+function Tile:RenderQuad(x, y, tileSize)
 	love.graphics.setColor(self:GetColor())
 	love.graphics.rectangle("fill", (x - 1) * tileSize, (y - 1) * tileSize, tileSize, tileSize)
+end
+
+-- Render the tile as hexagon
+function Tile:RenderHexa(px, py, tileSize)
+	love.graphics.setColor(self:GetColor())
+
+	local vertices = {}
+	for i = 0, 5 do
+		local angle = math.pi / 3 * i + math.pi / 6
+		local vx = px + tileSize * math.cos(angle)
+		local vy = py + tileSize * math.sin(angle)
+		table.insert(vertices, vx)
+		table.insert(vertices, vy)
+	end
+
+	love.graphics.polygon("fill", vertices)
 end
 
 return tile

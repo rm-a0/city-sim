@@ -379,7 +379,7 @@ function Generator:generateRoads(city)
 						and neighbor.tile.type ~= curr_tile.type
 					then
 						city:SetTile(x, y, "mainRoad")
-						city:SetTile(neighbor.x, neighbor.y, "mainRoad")
+						-- city:SetTile(neighbor.x, neighbor.y, "mainRoad")
 						break
 					end
 				end
@@ -420,10 +420,10 @@ function Generator:generateRoadsAndBridges(city)
 end
 
 function Generator:generateBuildings(city)
-	local buildings = poisson.sampleGrid(city.width, city.height, 1.5, 0.0000001)
+	local buildings = poisson.sampleGrid(city.width, city.height, 1.5, 0.0000000001)
 
 	for _, building in ipairs(buildings) do
-		local x, y = math.floor(building.x), math.floor(building.y)
+		local x, y = math.floor(building.x + 0.5), math.floor(building.y + 0.5)
 		city:SetTile(x, y, "defaultBuilding")
 	end
 end
