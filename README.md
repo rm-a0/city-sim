@@ -1,7 +1,8 @@
 # Overview
 Procedurally generated city simulator written in Lua using [LÖVE 2D](https://github.com/love2d/love) library.
 
-> **Note:** The main goal of this project was to gain in-depth knowledge of Lua, procedural generation, and graph algorithms therefore performance and language chosen for the implementation might not be optimal
+> [Note!]
+> The main goal of this project was to gain in-depth knowledge of Lua, procedural generation, and graph algorithms therefore performance and language chosen for the implementation might not be optimal
 
 # Table of Contents
   - [How to Use](#how-to-use)
