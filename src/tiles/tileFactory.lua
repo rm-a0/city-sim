@@ -11,6 +11,7 @@ tileFactory.types = {
 	water = require("tiles.tileTypes.water"),
 	mainRoad = require("tiles.tileTypes.mainRoad"),
 	secondaryRoad = require("tiles.tileTypes.secondaryRoad"),
+	defaultBuilding = require("tiles.tileTypes.defaultBuilding"),
 	-- topology tiles
 	depth01 = require("tiles.tileTypes.depth01"),
 	depth02 = require("tiles.tileTypes.depth02"),

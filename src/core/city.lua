@@ -23,13 +23,19 @@ function City:SetTile(x, y, type)
 	if not x or not y then
 		return
 	end
+
 	if x < 1 or x > self.width or y < 1 or y > self.height then
 		return
 	end
+
 	local newTile = tileFactory.new(type)
+
+	print(newTile.type)
+
 	if not newTile:CanPlace(self.grid[x][y]) then
 		return
 	end
+
 	self.grid[x][y] = newTile
 end
 
@@ -42,4 +48,3 @@ function City:GetTile(x, y)
 end
 
 return City
-

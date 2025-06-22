@@ -50,4 +50,3 @@ function Tile:Render2D(x, y, tileSize)
 end
 
 return tile
-

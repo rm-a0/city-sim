@@ -355,7 +355,7 @@ function Generator:generateCityZones(city)
 end
 
 function Generator:generateRoads(city)
-	local allowed_road_zones = {
+	local allowedRoadZones = {
 		["residential"] = true,
 		["commercial"] = true,
 	}
@@ -364,7 +364,7 @@ function Generator:generateRoads(city)
 		for y = 1, city.height do
 			local curr_tile = city:GetTile(x, y)
 
-			if allowed_road_zones[curr_tile.type] then
+			if allowedRoadZones[curr_tile.type] then
 				local neighbors = {
 					{ tile = city:GetTile(x, y - 1), x = x, y = y - 1 },
 					{ tile = city:GetTile(x, y + 1), x = x, y = y + 1 },
@@ -375,7 +375,7 @@ function Generator:generateRoads(city)
 				for _, neighbor in ipairs(neighbors) do
 					if
 						neighbor.tile
-						and allowed_road_zones[neighbor.tile.type]
+						and allowedRoadZones[neighbor.tile.type]
 						and neighbor.tile.type ~= curr_tile.type
 					then
 						city:SetTile(x, y, "mainRoad")
@@ -396,11 +396,11 @@ function Generator:generateRoadsAndBridges(city)
 
 	for _, road in ipairs(residentialRoads) do
 		local x, y = road.x, road.y
-		local curr_tile = city:GetTile(x, y)
-		if curr_tile and self.zoneMap[x][y] and self.zoneMap[x][y] == "residential" then
-			if curr_tile.type == "residential" then
+		local currTile = city:GetTile(x, y)
+		if currTile and self.zoneMap[x][y] and self.zoneMap[x][y] == "residential" then
+			if currTile.type == "residential" then
 				city:SetTile(x, y, "secondaryRoad")
-			elseif curr_tile.type == "water" then
+			elseif currTile.type == "water" then
 				city:SetTile(x, y, "secondaryRoad")
 			end
 		end
@@ -408,14 +408,23 @@ function Generator:generateRoadsAndBridges(city)
 
 	for _, road in ipairs(commercialRoads) do
 		local x, y = road.x, road.y
-		local curr_tile = city:GetTile(x, y)
-		if curr_tile and self.zoneMap[x][y] and self.zoneMap[x][y] == "commercial" then
-			if curr_tile.type == "commercial" then
+		local currTile = city:GetTile(x, y)
+		if currTile and self.zoneMap[x][y] and self.zoneMap[x][y] == "commercial" then
+			if currTile.type == "commercial" then
 				city:SetTile(x, y, "secondaryRoad")
-			elseif curr_tile.type == "water" then
+			elseif currTile.type == "water" then
 				city:SetTile(x, y, "secondaryRoad")
 			end
 		end
+	end
+end
+
+function Generator:generateBuildings(city)
+	local buildings = poisson.sampleGrid(city.width, city.height, 1.5, 0.0000001)
+
+	for _, building in ipairs(buildings) do
+		local x, y = math.floor(building.x), math.floor(building.y)
+		city:SetTile(x, y, "defaultBuilding")
 	end
 end
 
