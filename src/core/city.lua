@@ -30,8 +30,6 @@ function City:SetTile(x, y, type)
 
 	local newTile = tileFactory.new(type)
 
-	print(newTile.type)
-
 	if not newTile:CanPlace(self.grid[x][y]) then
 		return
 	end

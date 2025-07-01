@@ -6,7 +6,7 @@ local draw = require("render.draw")
 local _city
 local _generator
 
-local tileSize = 4
+local tileSize = 8
 local cityWidth = 400
 local cityHeight = 300
 
